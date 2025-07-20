@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  redis-server:
+    image: redis:7
+    container_name: redis-server
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - redisnet
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    restart: always
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8082}:8081"
+    environment:
+      REDIS_HOSTS: ${REDIS_COMMANDER_HOSTS:-local:redis-server:6379}
+    depends_on:
+      - redis-server
+    networks:
+      - redisnet
+
+volumes:
+  redisdata:
+
+networks:
+  redisnet:
